@@ -4,7 +4,7 @@
 
 本包是 [lywen-cyber](https://github.com/lywen-cyber) 的写作执行包，不是其他短剧 skill 的派生。包内是方法、阶段细则和教学用文件骨架，**不含客户或内部语料**。对照用的原文在单独的私有语料库，仅授权协作者可看；本包可独立使用。
 
-交稿标准按当次甲方书面要求灵活锁定。示例项目里的 8 集、每集 800–1000 字只是该示例的填法，不要当成所有项目的硬规则。
+口径优先级见 `SKILL.md`。
 
 ## 安装
 
@@ -37,7 +37,7 @@ git clone https://github.com/lywen-cyber/short-drama-skill.git .claude/skills/sh
 /export           → 按 brief 打包终本
 ```
 
-执行时按阶段加载 `references/` 里对应的文件，不要一次读完全部。看项目文件长什么样，打开 `examples/`（教学用最小骨架，不是当次订单，正文是占位）。
+执行时按阶段加载 `references/` 里对应的文件，不要一次读完全部。看文件形状和改前改后对照，打开 `examples/`（教学用，不是当次订单；项目正文是占位）。
 
 ## 两条路径
 
@@ -46,14 +46,14 @@ git clone https://github.com/lywen-cyber/short-drama-skill.git .claude/skills/sh
 
 两条路径在「人物」之后合并。一步确认后再进入下一步，不一次生成整部不可控稿。
 
-没有书面要求时，才用默认：海外中文一卡 8 集、每集 800–1000 字、不写第 9 集、交 Word。默认可以改，不能当成所有项目的硬规则。
+没有书面要求时的默认和优先级见 `SKILL.md`。
 
 ## 目录
 
 ```
 SKILL.md                   # 现行执行入口
 references/                # 按阶段加载的细则（13 份）
-examples/                  # 教学用骨架；分集约定为 episodes/第NN集.md
+examples/                  # 教学用骨架和改前改后对照；分集约定为 episodes/第NN集.md
 scripts/count.py           # 按当次字数规则统计源稿
 scripts/export_docx.py     # 按宁式把源稿导出为 Word
 scripts/test_count.py      # 字数口径与目录扫描回归测试
