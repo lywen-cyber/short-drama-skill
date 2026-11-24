@@ -33,7 +33,7 @@ description: >-
 必须锁定的字段见 `references/甲方要求模板.md`。缺项时，只问还没写清、且会改变做法的那几项。甲方没写的，才用默认：
 
 - 海外中文一卡，8 集
-- 每集 800–1000 字（汉字个数 + 英文单词数，不计空白）
+- 每集 800–1000 字。默认用本包口径（汉字个数 + 英文单词数，不计空白）；brief 可改为 Word 近似口径。交稿前两种都看，没写则以本包为准。Word 里看到的数字可能更大
 - 不写第 9 集，也不写超出交付集数的正文
 - 交 Word；文件名跟甲方，未指定则用中文剧名
 - 要不要对标：看甲方有没有要求；没有要求则走「不对标」路径
@@ -93,7 +93,7 @@ description: >-
 
 ### /episode
 
-按当次格式和字数写集。可写一集、一个区间、或下一集。加载正文格式、节奏、钩子、爽点；写第 1 集时加开篇；海外稿加本土化。写第 N 集前回顾已完成集、人物和小传、分集目录，发现矛盾主动提出。字数用 `scripts/count.py` 统计 Markdown 源稿，上下限取自 brief。分集统一保存为 `episodes/第NN集.md`（两位编号，如 `episodes/第01集.md`）。场头与 △、对白的排法可对照 `examples/示例项目/episodes/第01集.md`（占位稿）；写法按 `references/开篇.md`、`references/正文格式.md` 执行。
+按当次格式和字数写集。可写一集、一个区间、或下一集。加载正文格式、节奏、钩子、爽点；写第 1 集时加开篇；海外稿加本土化。写第 N 集前回顾已完成集、人物和小传、分集目录，发现矛盾主动提出。字数用 `scripts/count.py` 同时看本包口径和 Word 近似口径，上下限取自 brief；brief 没写口径则默认本包。源稿可用 Markdown 标题和加粗，脚本会剥掉符号再计字。分集统一保存为 `episodes/第NN集.md`（两位编号，如 `episodes/第01集.md`）。场头与 △、对白的排法可对照 `examples/示例项目/episodes/第01集.md`（占位稿）；写法按 `references/开篇.md`、`references/正文格式.md` 执行。
 
 ### /review
 
@@ -101,15 +101,16 @@ description: >-
 
 ### /revise
 
-按审查或甲方意见修改，并回查相邻集和集尾钩子，确认没改出新断链。改完用当次字数规则再统计源稿。
+按审查或甲方意见修改，并回查相邻集和集尾钩子，确认没改出新断链。改完用 brief 指定的口径再统计源稿；没写则默认本包，并对照 Word 近似口径。
 
 ### /export
 
-加载 `references/交稿打包.md` 和正文格式。只出终本，按 brief 的交付物和文件名打包。未要求的附件不要主动附上。交 Word 时用 `scripts/export_docx.py` 从源稿导出，以固定宁式排版（△ 与动作同一行，对白另起一行），不要临场自撰格式。交稿前的字数以 Markdown 源稿为准，用 `scripts/count.py` 统计。
+加载 `references/交稿打包.md` 和正文格式。只出终本，按 brief 的交付物和文件名打包。未要求的附件不要主动附上。交 Word 时用 `scripts/export_docx.py` 从源稿导出，以固定宁式排版（△ 与动作同一行，对白另起一行），不要临场自撰格式。源稿里的标题和加粗会剥掉符号、保留文字；可用 `--front` 把对标、大纲、人物小传依次放进文头。有 `episodes/` 时只导出该目录、不递归，避免把子目录旧稿导进去。交稿前用 `scripts/count.py` 同时看两种口径，以 brief 指定的为准；没写则默认本包口径，并注意 Word 里数字可能更大。
 
 ```bash
 pip install -r requirements.txt
 python scripts/export_docx.py <项目目录> -o <中文剧名或 brief 指定文件名>.docx
+python scripts/export_docx.py <项目目录> --front -o <中文剧名或 brief 指定文件名>.docx
 ```
 
 ## 怎样算做好

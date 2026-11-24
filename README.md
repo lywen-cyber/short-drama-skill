@@ -54,9 +54,10 @@ git clone https://github.com/lywen-cyber/short-drama-skill.git .claude/skills/sh
 SKILL.md                   # 现行执行入口
 references/                # 按阶段加载的细则（13 份）
 examples/                  # 教学用骨架和改前改后对照；分集约定为 episodes/第NN集.md
-scripts/count.py           # 按当次字数规则统计源稿
+scripts/script_text.py     # 源稿规范化、分集扫描和两种计字口径（共用）
+scripts/count.py           # 按当次字数规则统计源稿（本包 / Word 近似）
 scripts/export_docx.py     # 按宁式把源稿导出为 Word
-scripts/test_count.py      # 字数口径与目录扫描回归测试
+scripts/test_count.py      # 字数口径、目录扫描与导出回归测试
 requirements.txt           # export_docx.py 依赖（python-docx）
 ```
 
@@ -80,30 +81,35 @@ requirements.txt           # export_docx.py 依赖（python-docx）
 
 ## 字数统计
 
-按当次 brief 的上下限统计，不要暗自更换口径。交稿前的字数以 Markdown 源稿为准，用本脚本统计，不要改去读 Word。
+按当次 brief 的上下限统计，不要暗自更换口径。交稿前用 `scripts/count.py` 同时看「本包口径」和「Word 近似口径」，以 brief 指定的为准；brief 没写则默认本包口径，并注意 Word 里看到的数字可能更大。脚本读 Markdown 源稿，不直接读 Word。源稿可用 Markdown 标题和加粗，脚本会剥掉行首 `#` 和包裹的 `**`，再计字。
 
-默认口径是汉字个数 + 英文单词数，不计空白。另外：
+本包口径：汉字个数 + 英文单词数，不计空白、中文标点和 △。另外：
 
-- 跳过集标题行（「第1集」「第 1 集」「第一集」「第1集 背叛」等）、场头（含全角空格和「1-1-1 回忆」这类闪回场号），以及「人物：」「人物:」行。
-- 整行只是【音效】【闪回】这类幕头或音效标记的，不计正文字；嵌在动作段落中的，只计对外可见描述。
+- 跳过集标题行（「第1集」「第 1 集」「第一集」「第1集 背叛」「第1集：背叛」「第1集《背叛》」等）、场头（含全角空格、「1-1-1 回忆」，以及写成 `### 1-1 客厅 夜 内` 的标题行），以及「人物：」「人物:」行。
+- 制作类标记（音效、特写、闪回等）：整行不计；嵌在段落里的整段去掉，包括【闪回—三年前】这类带说明的写法，不把说明算进正文。
+- 内容类标记（字幕、弹幕、短信、新闻）：只计括号里的文字。整行内容类标记不再记 0。
 - `$5,000,000`、`1,200`、`30%` 这类金额或带千分位、百分号的数字按 1 个英文单词计，避免商战戏金额被记成 0。
 
-分集统一放在 `episodes/第NN集.md`（两位编号）。按目录统计时默认扫这个路径，同时兼容旧的 `ep*.txt` 和根目录 `第N集.md`。
+Word 近似口径把中文标点、△、场头、人物行、集标题也算进去。这是尽量接近 Word「字数」的近似，不是打开 Word 后的官方统计。判定上下限时可用 `--metric pack`（默认）或 `--metric word`。
+
+分集统一放在 `episodes/第NN集.md`（两位编号）。按目录统计时，有 `episodes/` 就只读这个目录、不递归；没有它才回退到项目根目录的 `第N集.md` 或 `ep*.txt`，不会扫描子目录里的旧稿。同一集号出现两次、或传了 `--episodes N` 却缺集、多集，脚本会报错并以非零退出。字数不合格时也返回非零。
 
 ```bash
 python scripts/count.py examples/示例项目 --min 800 --max 1000
 python scripts/count.py examples/示例项目/episodes/第01集.md --min 800 --max 1000
+python3 scripts/test_count.py
 ```
 
-甲方另有口径时，改统计方式或改脚本参数，以书面要求为准。
+示例项目里的第 1 集是占位稿，字数低于 800，上面带 `--min` 的命令会打印「低于下限」并以非零退出，这是合格判定，不是脚本坏了。回归测试用：`python3 scripts/test_count.py`。
 
 ## 导出 Word
 
-交 Word 时用 `scripts/export_docx.py`，不要临场自撰排版。脚本按宁式写出：△ 与动作同一行，对白另起一行。导出的 `.docx` 不要提交进仓库。
+交 Word 时用 `scripts/export_docx.py`，不要临场自撰排版。脚本按宁式写出：△ 与动作同一行，对白另起一行。源稿里的标题和加粗会剥掉符号、保留文字，场头不会因为写成 `###` 而在 Word 里消失。可用 `--front` 按约定或指定文件把对标、大纲、人物小传依次放进文头。扫描范围与 `count.py` 相同，避免把子目录旧稿导进去。导出的 `.docx` 不要提交进仓库。
 
 ```bash
 pip install -r requirements.txt
 python scripts/export_docx.py examples/示例项目 --title 示例项目 -o /tmp/示例项目.docx
+python scripts/export_docx.py examples/示例项目 --front --title 示例项目 -o /tmp/示例项目.docx
 ```
 
 文件名跟 brief；未指定则用中文剧名。
