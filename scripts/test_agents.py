@@ -34,7 +34,19 @@ class AgentFilesTest(unittest.TestCase):
 
     def test_key_rules_present(self) -> None:
         text = MAIN.read_text(encoding="utf-8")
-        for needle in ("brief.md", "episode-directory.md", "continuity.md", "没有引文的分数作废", "最多两轮", "交人工", "写手不能改分"):
+        for needle in (
+            "brief.md",
+            "episode-directory.md",
+            "continuity.md",
+            "没有引文的分数作废",
+            "最多两轮",
+            "交人工",
+            "写手不能改分",
+            "梗概模式",
+            "买不买",
+            "卖点",
+            "严重度固定为「建议」",
+        ):
             self.assertIn(needle, text)
 
 
