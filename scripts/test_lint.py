@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""lint.py 的回归测试：说话人、场头、△ 排法、神态词报告与退出码。"""
+"""lint.py 的回归测试：说话人、场头、△ 排法、神态词与陈词滥调报告、退出码。"""
 from __future__ import annotations
 
 import subprocess
@@ -206,6 +206,34 @@ class LintRulesTest(unittest.TestCase):
 
     def test_main_missing_path(self) -> None:
         self.assertEqual(main(["/tmp/does-not-exist-lint-skill"]), 1)
+
+    def test_cliches_are_reported_but_not_errors(self) -> None:
+        ep = CLEAN_EPISODE + "\n莱恩：你也知道，这不可能。\n"
+        with tempfile.TemporaryDirectory() as td:
+            root = write_project(td, ep)
+            issues, manner, _ = lint_path(root)
+            self.assertEqual(issues, [], [i.format() for i in issues])
+            self.assertGreaterEqual(manner["你也知道"], 1)
+            self.assertGreaterEqual(manner["这不可能"], 1)
+            proc = run_lint(str(root))
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            self.assertIn("陈词滥调统计", proc.stdout)
+            self.assertIn("你也知道", proc.stdout)
+            self.assertIn("这不可能", proc.stdout)
+
+    def test_clean_episode_has_no_cliche_report(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = write_project(td, CLEAN_EPISODE)
+            proc = run_lint(str(root))
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            self.assertNotIn("陈词滥调统计", proc.stdout)
+
+    def test_authorized_sample_passes(self) -> None:
+        root = SCRIPTS.parent / "examples" / "授权示范"
+        issues, _, _ = lint_path(root)
+        self.assertEqual(issues, [], [i.format() for i in issues])
+        proc = run_lint(str(root))
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
 
 
 if __name__ == "__main__":

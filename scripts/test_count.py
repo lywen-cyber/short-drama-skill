@@ -329,5 +329,14 @@ class ExportNormalizeTest(unittest.TestCase):
             self.assertFalse(any("不该出现" in t for t in paras))
 
 
+class AuthorizedSampleTest(unittest.TestCase):
+    def test_authorized_sample_pack_count(self) -> None:
+        root = REPO / "examples" / "授权示范"
+        proc = run_count(str(root), "--min", "730", "--max", "730")
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+        self.assertIn("本包 730", proc.stdout)
+
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -2,7 +2,7 @@
 
 给其他 AI 快速上手的写作 skill：先读甲方要求，再按要求写短剧、写到能交，并在交稿前按同一套标准自检。
 
-本包是 [lywen-cyber](https://github.com/lywen-cyber) 的写作执行包，不是其他短剧 skill 的派生。包内是方法、阶段细则和教学用文件骨架，**不含客户或内部语料**。对照用的原文在单独的私有语料库，仅授权协作者可看；本包可独立使用。
+本包是 [lywen-cyber](https://github.com/lywen-cyber) 的写作执行包，不是其他短剧 skill 的派生。包内是方法、阶段细则、教学用文件骨架，以及一份经授权改编的第 1 集教学示范（人名与专有名称已更换）。除此之外不含客户或内部语料。对照用的原文在单独的私有语料库，仅授权协作者可看；本包可独立使用。
 
 口径优先级见 `SKILL.md`。
 
@@ -37,7 +37,7 @@ git clone https://github.com/lywen-cyber/short-drama-skill.git .claude/skills/sh
 /export           → 按 brief 打包终本
 ```
 
-执行时按阶段加载 `references/` 里对应的文件，不要一次读完全部。看文件形状和改前改后对照，打开 `examples/`（教学用，不是当次订单；项目正文是占位）。
+执行时按阶段加载 `references/` 里对应的文件，不要一次读完全部。看文件形状和改前改后对照，打开 `examples/`（教学用，不是当次订单；`示例项目` 的正文是占位，`授权示范` 是经授权改编的完整第 1 集）。
 
 ## 两条路径
 
@@ -52,11 +52,11 @@ git clone https://github.com/lywen-cyber/short-drama-skill.git .claude/skills/sh
 
 ```
 SKILL.md                   # 现行执行入口
-references/                # 按阶段加载的细则（13 份）
-examples/                  # 教学用骨架和改前改后对照；分集约定为 episodes/第NN集.md
+references/                # 按阶段加载的细则（18 份）
+examples/                  # 教学用骨架、改前改后对照，以及经授权改编的第 1 集示范；分集约定为 episodes/第NN集.md
 scripts/script_text.py     # 源稿规范化、分集扫描和两种计字口径（共用）
 scripts/count.py           # 按当次字数规则统计源稿（本包 / Word 近似）
-scripts/lint.py            # /review 时先跑的轻量检查（说话人、场头、△ 排法）
+scripts/lint.py            # /review 时先跑的轻量检查（说话人、场头、△ 排法；神态词和陈词滥调只报告）
 scripts/export_docx.py     # 按宁式把源稿导出为 Word
 scripts/test_count.py      # 字数口径、目录扫描与导出回归测试
 scripts/test_lint.py       # lint 回归测试
@@ -70,6 +70,7 @@ requirements.txt           # export_docx.py 依赖（python-docx）
 | references/甲方要求模板.md | /brief |
 | references/对标拆剧.md | /benchmark（仅路径 A） |
 | references/提案与大纲.md | /plan |
+| references/题材库.md | /plan |
 | references/人物小传.md | /characters |
 | references/开篇.md | /plan，以及写第 1 集时的 /episode |
 | references/钩子与卡点.md | /plan、/outline、/episode |
@@ -77,8 +78,12 @@ requirements.txt           # export_docx.py 依赖（python-docx）
 | references/爽点.md | /plan、/episode、/review |
 | references/反派.md | /characters、/plan |
 | references/正文格式.md | /episode、/export |
+| references/对白.md | /episode、/review |
+| references/连续性追踪.md | /outline、/episode、/review |
 | references/海外本土化.md | 仅海外稿：/brief 之后、/episode、/review |
 | references/审查清单.md | /review、/revise |
+| references/过稿反馈.md | 交稿或被退之后（可选） |
+| references/时下热卖.md | /plan 时可选；须人工更新，空表不作结论 |
 | references/交稿打包.md | /export |
 
 ## 字数统计
@@ -99,22 +104,24 @@ Word 近似口径把中文标点、△、场头、人物行、集标题也算进
 ```bash
 python scripts/count.py examples/示例项目 --min 800 --max 1000
 python scripts/count.py examples/示例项目/episodes/第01集.md --min 800 --max 1000
+python scripts/count.py examples/授权示范 --min 730 --max 730
 python3 scripts/test_count.py
 python3 scripts/test_lint.py
 ```
 
-示例项目里的第 1 集是占位稿，字数低于 800，上面带 `--min` 的命令会打印「低于下限」并以非零退出，这是合格判定，不是脚本坏了。回归测试用：`python3 scripts/test_count.py`；lint 测试用：`python3 scripts/test_lint.py`。
+示例项目里的第 1 集是占位稿，字数低于 800，上面带 `--min 800` 的命令会打印「低于下限」并以非零退出，这是合格判定，不是脚本坏了。`examples/授权示范` 是经授权改编的完整第 1 集，按实际篇幅收录（本包口径 730 字），不要用默认的 800–1000 去裁改；用 `--min 730 --max 730` 核。回归测试用：`python3 scripts/test_count.py`；lint 测试用：`python3 scripts/test_lint.py`。
 
 ## 分集检查
 
-`/review` 时先跑 `scripts/lint.py`，再按审查清单做人工判断。脚本只查机器能稳定判断的问题：台词说话人是否出现在本场「人物：」里、是否出现在 `characters.md` 小传中（项目里有这个文件才查）、场头在剥掉 `#` 之后是否可识别、△ 是否单独成行或与对白挤在同一段。「冷笑」「一脸」这类神态词只统计报告，不当错误。发现问题以非零退出。
+`/review` 时先跑 `scripts/lint.py`，再按审查清单做人工判断。脚本只查机器能稳定判断的问题：台词说话人是否出现在本场「人物：」里、是否出现在 `characters.md` 小传中（项目里有这个文件才查）、场头在剥掉 `#` 之后是否可识别、△ 是否单独成行或与对白挤在同一段。「冷笑」「一脸」这类神态词，以及「你也知道」这类陈词滥调，只统计报告，不当错误。发现问题以非零退出。
 
 ```bash
 python3 scripts/lint.py <项目目录>
 python3 scripts/lint.py examples/示例项目
+python3 scripts/lint.py examples/授权示范
 ```
 
-示例项目里的第 1 集是格式占位，说话人写成「姓名」，跑上面第二条会报问题并以非零退出，这是预期结果，不是脚本坏了。真正项目应使用姓名，并与本场人物表、小传一致。
+示例项目里的第 1 集是格式占位，说话人写成「姓名」，跑上面第二条会报问题并以非零退出，这是预期结果，不是脚本坏了。真正项目应使用姓名，并与本场人物表、小传一致。`examples/授权示范` 应能通过 lint，并以 0 退出。
 
 ## 导出 Word
 

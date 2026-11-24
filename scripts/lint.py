@@ -2,7 +2,7 @@
 """轻量分集检查：场头、本场人物、小传人名、△ 排法。
 
 供 /review 先跑。只查机器能稳定判断的格式和一致性问题，不做剧情评判。
-「冷笑」「一脸」这类神态词只统计报告，不当错误。
+「冷笑」「一脸」这类神态词，以及「你也知道」这类陈词滥调，只统计报告，不当错误。
 发现问题以非零退出。
 """
 from __future__ import annotations
@@ -94,6 +94,30 @@ MANNERISMS = (
     "眼神一凛",
     "咬牙",
     "眼眶",
+)
+
+# 只统计报告，不当硬错误。清单与 references/对白.md 保持一致。
+CLICHES = (
+    "我很生气",
+    "我很伤心",
+    "我很害怕",
+    "我很高兴",
+    "你也知道",
+    "众所周知",
+    "事情是这样的",
+    "说来话长",
+    "你听我解释",
+    "你给我听好了",
+    "你给我记住",
+    "你会后悔的",
+    "走着瞧",
+    "从今以后",
+    "放尊重一点",
+    "你算什么东西",
+    "你配吗",
+    "贱人",
+    "这不可能",
+    "绝不会放过你",
 )
 
 _HEADING_NAME = re.compile(r"^#{2,6}[ \t\u3000]+(.+?)\s*$")
@@ -322,6 +346,10 @@ def lint_episode(path: Path, roster: set[str] | None) -> tuple[list[Issue], Coun
                 c = s.count(word)
                 if c:
                     manner[word] += c
+            for word in CLICHES:
+                c = s.count(word)
+                if c:
+                    manner[word] += c
 
     return issues, manner
 
@@ -348,15 +376,20 @@ def lint_path(path: Path) -> tuple[list[Issue], Counter[str], Path | None]:
 
 
 def format_mannerisms(manner: Counter[str]) -> str | None:
-    if not manner:
-        return None
-    parts = [f"{w} {manner[w]}" for w in MANNERISMS if manner[w]]
-    return "神态词统计（只报告，不当错误）：" + "，".join(parts)
+    """格式化神态词与陈词滥调报告；没有命中时返回 None。"""
+    blocks: list[str] = []
+    manner_parts = [f"{w} {manner[w]}" for w in MANNERISMS if manner[w]]
+    if manner_parts:
+        blocks.append("神态词统计（只报告，不当错误）：" + "，".join(manner_parts))
+    cliche_parts = [f"{w} {manner[w]}" for w in CLICHES if manner[w]]
+    if cliche_parts:
+        blocks.append("陈词滥调统计（只报告，不当错误）：" + "，".join(cliche_parts))
+    return "\n".join(blocks) if blocks else None
 
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(
-        description="轻量检查分集场头、说话人和 △ 排法；神态词只报告。"
+        description="轻量检查分集场头、说话人和 △ 排法；神态词和陈词滥调只报告。"
     )
     p.add_argument("path", help="项目目录或单个分集文件")
     args = p.parse_args(argv)
