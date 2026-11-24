@@ -4,3 +4,4 @@
 .vscode/
 __pycache__/
 .drama-state.json
+*.docx

@@ -51,10 +51,13 @@ git clone https://github.com/lywen-cyber/short-drama-skill.git .claude/skills/sh
 ## 目录
 
 ```
-SKILL.md                 # 现行执行入口
-references/              # 按阶段加载的细则（13 份）
-examples/                # 最小项目文件形状示例（教学用）
-scripts/count.py         # 按当次字数规则统计
+SKILL.md                   # 现行执行入口
+references/                # 按阶段加载的细则（13 份）
+examples/                  # 教学用骨架；分集约定为 episodes/第NN集.md
+scripts/count.py           # 按当次字数规则统计源稿
+scripts/export_docx.py     # 按宁式把源稿导出为 Word
+scripts/test_count.py      # 字数口径与目录扫描回归测试
+requirements.txt           # export_docx.py 依赖（python-docx）
 ```
 
 ## 参考资料：按阶段加载
@@ -77,13 +80,33 @@ scripts/count.py         # 按当次字数规则统计
 
 ## 字数统计
 
-按当次 brief 的上下限统计，不要暗自更换口径。默认口径是汉字个数 + 英文单词数，不计空白：
+按当次 brief 的上下限统计，不要暗自更换口径。交稿前的字数以 Markdown 源稿为准，用本脚本统计，不要改去读 Word。
+
+默认口径是汉字个数 + 英文单词数，不计空白。另外：
+
+- 跳过集标题行（「第1集」「第 1 集」「第一集」「第1集 背叛」等）、场头（含全角空格和「1-1-1 回忆」这类闪回场号），以及「人物：」「人物:」行。
+- 整行只是【音效】【闪回】这类幕头或音效标记的，不计正文字；嵌在动作段落中的，只计对外可见描述。
+- `$5,000,000`、`1,200`、`30%` 这类金额或带千分位、百分号的数字按 1 个英文单词计，避免商战戏金额被记成 0。
+
+分集统一放在 `episodes/第NN集.md`（两位编号）。按目录统计时默认扫这个路径，同时兼容旧的 `ep*.txt` 和根目录 `第N集.md`。
 
 ```bash
-python scripts/count.py 第1集.md --min 800 --max 1000
+python scripts/count.py examples/示例项目 --min 800 --max 1000
+python scripts/count.py examples/示例项目/episodes/第01集.md --min 800 --max 1000
 ```
 
 甲方另有口径时，改统计方式或改脚本参数，以书面要求为准。
+
+## 导出 Word
+
+交 Word 时用 `scripts/export_docx.py`，不要临场自撰排版。脚本按宁式写出：△ 与动作同一行，对白另起一行。导出的 `.docx` 不要提交进仓库。
+
+```bash
+pip install -r requirements.txt
+python scripts/export_docx.py examples/示例项目 --title 示例项目 -o /tmp/示例项目.docx
+```
+
+文件名跟 brief；未指定则用中文剧名。
 
 ## 许可证
 

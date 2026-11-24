@@ -12,6 +12,6 @@
 | `示例项目/creative-plan.md` | `/plan` | 演示提案与大纲要写清哪些块 |
 | `示例项目/characters.md` | `/characters` | 演示人物小传栏位 |
 | `示例项目/episode-directory.md` | `/outline` | 演示分集目录一行一条 |
-| `示例项目/第1集.md` | `/episode` | 演示场头、人物、△、对白的排法；正文是占位 |
+| `示例项目/episodes/第01集.md` | `/episode` | 演示场头、人物、△、对白的排法；正文是占位。分集统一为 `episodes/第NN集.md`（两位编号） |
 
 本包可独立使用。对照用的原文在单独的私有语料库，仅授权协作者可看。
