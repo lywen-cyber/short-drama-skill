@@ -32,7 +32,7 @@ git clone https://github.com/lywen-cyber/short-drama-skill.git .claude/skills/sh
 /characters       → 人物小传与关系
 /outline          → 分集目录
 /episode          → 按集写正文（可写一集、一个区间、或下一集）
-/review           → 按当次 brief 和审查清单自检
+/review           → 先跑 lint.py，再按当次 brief 和审查清单自检
 /revise           → 按审查或甲方意见修改，并回查相邻集
 /export           → 按 brief 打包终本
 ```
@@ -56,8 +56,10 @@ references/                # 按阶段加载的细则（13 份）
 examples/                  # 教学用骨架和改前改后对照；分集约定为 episodes/第NN集.md
 scripts/script_text.py     # 源稿规范化、分集扫描和两种计字口径（共用）
 scripts/count.py           # 按当次字数规则统计源稿（本包 / Word 近似）
+scripts/lint.py            # /review 时先跑的轻量检查（说话人、场头、△ 排法）
 scripts/export_docx.py     # 按宁式把源稿导出为 Word
 scripts/test_count.py      # 字数口径、目录扫描与导出回归测试
+scripts/test_lint.py       # lint 回归测试
 requirements.txt           # export_docx.py 依赖（python-docx）
 ```
 
@@ -98,9 +100,21 @@ Word 近似口径把中文标点、△、场头、人物行、集标题也算进
 python scripts/count.py examples/示例项目 --min 800 --max 1000
 python scripts/count.py examples/示例项目/episodes/第01集.md --min 800 --max 1000
 python3 scripts/test_count.py
+python3 scripts/test_lint.py
 ```
 
-示例项目里的第 1 集是占位稿，字数低于 800，上面带 `--min` 的命令会打印「低于下限」并以非零退出，这是合格判定，不是脚本坏了。回归测试用：`python3 scripts/test_count.py`。
+示例项目里的第 1 集是占位稿，字数低于 800，上面带 `--min` 的命令会打印「低于下限」并以非零退出，这是合格判定，不是脚本坏了。回归测试用：`python3 scripts/test_count.py`；lint 测试用：`python3 scripts/test_lint.py`。
+
+## 分集检查
+
+`/review` 时先跑 `scripts/lint.py`，再按审查清单做人工判断。脚本只查机器能稳定判断的问题：台词说话人是否出现在本场「人物：」里、是否出现在 `characters.md` 小传中（项目里有这个文件才查）、场头在剥掉 `#` 之后是否可识别、△ 是否单独成行或与对白挤在同一段。「冷笑」「一脸」这类神态词只统计报告，不当错误。发现问题以非零退出。
+
+```bash
+python3 scripts/lint.py <项目目录>
+python3 scripts/lint.py examples/示例项目
+```
+
+示例项目里的第 1 集是格式占位，说话人写成「姓名」，跑上面第二条会报问题并以非零退出，这是预期结果，不是脚本坏了。真正项目应使用姓名，并与本场人物表、小传一致。
 
 ## 导出 Word
 
