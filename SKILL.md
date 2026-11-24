@@ -60,6 +60,7 @@ description: >-
 | references/对标拆剧.md | /benchmark（仅路径 A） |
 | references/提案与大纲.md | /plan |
 | references/题材库.md | /plan |
+| references/节拍卡.md | /plan、/outline |
 | references/人物小传.md | /characters |
 | references/开篇.md | /plan，以及写第 1 集时的 /episode |
 | references/钩子与卡点.md | /plan、/outline、/episode |
@@ -71,6 +72,8 @@ description: >-
 | references/连续性追踪.md | /outline、/episode、/review |
 | references/海外本土化.md | 仅海外稿：/brief 之后、/episode、/review |
 | references/审查清单.md | /review、/revise |
+| references/评分锚点.md | /review（审稿编辑打分用） |
+| references/甲方反馈翻译.md | /revise（收到甲方意见时） |
 | references/过稿反馈.md | 交稿或被退之后（可选） |
 | references/时下热卖.md | /plan 时可选；须人工更新，空表不作结论 |
 | references/交稿打包.md | /export |
@@ -97,7 +100,9 @@ description: >-
 
 加载提案、开篇、钩子、节奏、爽点（路径 A 可同时对照已完成的对标笔记）。产出提案、一句话故事、交付范围内大纲，以及卖点如何在交付集数内兑现。若 brief 要求全剧梗概或后续走向，另写一节，不要和交付范围内大纲混在一起。保存为 `creative-plan.md`。文件形状可对照 `examples/示例项目/creative-plan.md`。
 
-写完一句话故事后，先点名本剧类型，再说这本新在哪，再说为什么不是照搬；对照 `references/题材库.md`。说不出这三句，就先不要进入分集。然后再自检两句：一句话梗里有没有身份反差、强关系和明确的爽点承诺；第 1 集里能不能剪出一条 30 秒素材。默认 8 集且 brief 未另给结构时，分集节奏可对照 `references/节奏.md` 里的参考弧线，可被 brief 覆盖。
+立项先出 3–5 条 logline，不要只交第一个想到的版本。每条写一句话故事，并各自点名类型。交给审稿编辑（`agents/审稿编辑.md`）按新鲜和卖点各打 1–5 分、引那条 logline 的原话，再把分数和理由交使用者挑；使用者选定后，才写大纲。开不了独立 agent 时，同样开新会话、只给它 brief 和这几条 logline。
+
+选定之后，先点名本剧类型，再说这本新在哪，再说为什么不是照搬；对照 `references/题材库.md`。说不出这三句，就先不要进入分集。然后再自检两句：一句话梗里有没有身份反差、强关系和明确的爽点承诺；第 1 集里能不能剪出一条 30 秒素材。默认 8 集且 brief 未另给结构时，分集节奏可对照 `references/节奏.md` 里的参考弧线，可被 brief 覆盖；同类型的第 1 集节拍可对照 `references/节拍卡.md`。
 
 ### /characters
 
@@ -105,7 +110,7 @@ description: >-
 
 ### /outline
 
-加载钩子、节奏、卡点。为交付范围内的每一集写一行，栏位与示例表一致：集｜本集任务｜上集钩子如何接住｜本集集尾钩子｜钩子类型｜兑现类型。保存为 `episode-directory.md`。文件形状可对照 `examples/示例项目/episode-directory.md`。提醒使用者先通读目录再写正文；钩子能否接上，在目录阶段就要能看出来。同时在项目里建立或更新 `continuity.md`（人名、时间线、谁知道什么、钩子还开或已兑现），模板见 `references/连续性追踪.md`。默认 8 集的参考弧线见 `references/节奏.md`，可被 brief 覆盖。
+加载钩子、节奏、卡点。为交付范围内的每一集写一行，栏位与示例表一致：集｜本集任务｜上集钩子如何接住｜本集集尾钩子｜钩子类型｜兑现类型｜素材点。素材点写本集能单独剪成 15–30 秒广告的片段（耳光、揭露、身份反转、当众翻盘等），第 1–3 集各至少一个。保存为 `episode-directory.md`。文件形状可对照 `examples/示例项目/episode-directory.md`。提醒使用者先通读目录再写正文；钩子能否接上，在目录阶段就要能看出来。同时在项目里建立或更新 `continuity.md`（人名、时间线、谁知道什么、钩子还开或已兑现），模板见 `references/连续性追踪.md`。默认 8 集的参考弧线见 `references/节奏.md`，可被 brief 覆盖。
 
 ### /episode
 
@@ -115,7 +120,9 @@ description: >-
 
 加载 `references/审查清单.md`，并用当次 brief 覆盖通用项。先跑 `python3 scripts/lint.py <项目目录>`，处理说话人、场头、△ 排法这类机器能查的问题；神态词和陈词滥调统计只作参考，不当硬错误。再按审查清单做人工判断，并核开篇与节奏的默认目标（可被 brief 覆盖）：第 1 集前约 50–100 字是否出现冲突或异常；第一次可见兑现是否最迟落在第 3 集；若 brief 有付费卡点，是否用了本批最强悬念。合规项按审查清单核对，只作提醒，不是法律意见。审查意见固定成表：位置｜问题｜违反哪条｜改法｜严重度（必改 / 建议）；格式小错和逻辑错分开填，不打空分、不套话。路径 A 才查对标框架；海外稿才查本土化，美国设定见 `references/海外本土化.md`。
 
-可另做一遍独立打分：只读 brief 和正文，按钩子、兑现、新鲜、清晰、对白逐集打 1–5 分。推荐门为每集各项 ≥3，第 1 集和第 8 集 ≥4，可被 brief 改写，不是死标准。低于推荐门时列出问题，建议进入 `/revise`；不要把未过线写成自动不通过或自动过稿，是否放行以 brief 和使用者判断为准。对外提交前，建议由人再看第 1 集和第 8 集；这是交稿习惯，不是本阶段的硬门。
+打分交给独立的审稿编辑，不由写手自己打。Claude Code 里用 `.claude/agents/审稿编辑.md` 这个子 agent；其他工具读 `agents/审稿编辑.md`（两份内容相同）。审稿编辑只读 `brief.md`、`episode-directory.md`、`continuity.md` 和分集正文，不读写作对话、`creative-plan.md` 的推理和写手批注；按钩子、兑现、新鲜、清晰、对白逐集打 1–5 分，每个分数必须引正文原句，没有引文的分数作废；并标出每集第一次冲突、本集转折大概落在第几字（`scripts/positions.py`），检查第 1–3 集的素材点。**开不了独立 agent 时，开一个新会话，只给它上面这几份文件和 `agents/审稿编辑.md`，不要在写作会话里自评。**
+
+写手不能改分，只能改正文再请求复审。最多两轮「审 → 改 → 复审」，仍未过推荐门就停，交人看，并附问题清单。推荐门以 brief 为准；brief 没写时用本包推荐：每集五项平均 ≥3 且没有任何一项是 1 分；第 1 集钩子 ≥4；交付范围最后一集（默认第 8 集）钩子 ≥4（该门已按真实样本校准，第 8 集部分尚无校准数据，见 `references/评分锚点.md`）。推荐门不是死标准；未过只表示建议改，不要写成自动不通过，过了也不等于已经过稿。甲方含糊意见先对 `references/甲方反馈翻译.md`。对外提交前，建议由人再看第 1 集和第 8 集；这是交稿习惯，不是本阶段的硬门。
 
 ### /revise
 
@@ -124,6 +131,8 @@ description: >-
 ### /export
 
 加载 `references/交稿打包.md` 和正文格式。只出终本，按 brief 的交付物和文件名打包。未要求的附件不要主动附上。交 Word 时用 `scripts/export_docx.py` 从源稿导出，以固定宁式排版（△ 与动作同一行，对白另起一行），不要临场自撰格式。源稿里的标题和加粗会剥掉符号、保留文字；可用 `--front` 把对标、大纲、人物小传依次放进文头。有 `episodes/` 时只导出该目录、不递归，避免把子目录旧稿导进去。交稿前用 `scripts/count.py` 同时看两种口径，以 brief 指定的为准；没写则默认本包口径，并注意 Word 里数字可能更大。
+
+另附一页编辑 pitch（brief 不要时可省），固定五块：logline、3 个卖点、第 1–8 集兑现分布（按交付集数）、主角标签、付费卡点钩子。格式见 `references/交稿打包.md`。
 
 ```bash
 pip install -r requirements.txt

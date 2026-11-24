@@ -32,7 +32,7 @@ git clone https://github.com/lywen-cyber/short-drama-skill.git .claude/skills/sh
 /characters       → 人物小传与关系
 /outline          → 分集目录
 /episode          → 按集写正文（可写一集、一个区间、或下一集）
-/review           → 先跑 lint.py，再按当次 brief 和审查清单自检
+/review           → 先跑 lint.py，再交独立审稿编辑按 brief 引原句打分（最多两轮）
 /revise           → 按审查或甲方意见修改，并回查相邻集
 /export           → 按 brief 打包终本
 ```
@@ -52,12 +52,17 @@ git clone https://github.com/lywen-cyber/short-drama-skill.git .claude/skills/sh
 
 ```
 SKILL.md                   # 现行执行入口
-references/                # 按阶段加载的细则（18 份）
+references/                # 按阶段加载的细则（21 份）
+agents/审稿编辑.md          # 独立审稿编辑（只读 brief、目录、continuity 和正文，引原句打分）
+.claude/agents/审稿编辑.md  # 同一文件，供 Claude Code 当子 agent 用
 examples/                  # 教学用骨架、改前改后对照，以及经授权改编的第 1 集示范；分集约定为 episodes/第NN集.md
 scripts/script_text.py     # 源稿规范化、分集扫描和两种计字口径（共用）
 scripts/count.py           # 按当次字数规则统计源稿（本包 / Word 近似）
 scripts/lint.py            # /review 时先跑的轻量检查（说话人、场头、△ 排法；神态词和陈词滥调只报告）
 scripts/export_docx.py     # 按宁式把源稿导出为 Word
+scripts/positions.py       # 标出正文每行或某句落在第几字（审稿标第一次冲突和转折用）
+scripts/test_positions.py  # positions 回归测试
+scripts/test_agents.py     # 审稿编辑 agent 文件一致性测试
 scripts/test_count.py      # 字数口径、目录扫描与导出回归测试
 scripts/test_lint.py       # lint 回归测试
 requirements.txt           # export_docx.py 依赖（python-docx）
@@ -71,6 +76,7 @@ requirements.txt           # export_docx.py 依赖（python-docx）
 | references/对标拆剧.md | /benchmark（仅路径 A） |
 | references/提案与大纲.md | /plan |
 | references/题材库.md | /plan |
+| references/节拍卡.md | /plan、/outline |
 | references/人物小传.md | /characters |
 | references/开篇.md | /plan，以及写第 1 集时的 /episode |
 | references/钩子与卡点.md | /plan、/outline、/episode |
@@ -82,6 +88,8 @@ requirements.txt           # export_docx.py 依赖（python-docx）
 | references/连续性追踪.md | /outline、/episode、/review |
 | references/海外本土化.md | 仅海外稿：/brief 之后、/episode、/review |
 | references/审查清单.md | /review、/revise |
+| references/评分锚点.md | /review（审稿编辑打分用） |
+| references/甲方反馈翻译.md | /revise（收到甲方意见时） |
 | references/过稿反馈.md | 交稿或被退之后（可选） |
 | references/时下热卖.md | /plan 时可选；须人工更新，空表不作结论 |
 | references/交稿打包.md | /export |
@@ -107,6 +115,9 @@ python scripts/count.py examples/示例项目/episodes/第01集.md --min 800 --m
 python scripts/count.py examples/授权示范 --min 730 --max 730
 python3 scripts/test_count.py
 python3 scripts/test_lint.py
+python3 scripts/test_positions.py
+python3 scripts/test_agents.py
+python3 scripts/positions.py examples/授权示范 --find "你不够安全"
 ```
 
 示例项目里的第 1 集是占位稿，字数低于 800，上面带 `--min 800` 的命令会打印「低于下限」并以非零退出，这是合格判定，不是脚本坏了。`examples/授权示范` 是经授权改编的完整第 1 集，按实际篇幅收录（本包口径 730 字），不要用默认的 800–1000 去裁改；用 `--min 730 --max 730` 核。回归测试用：`python3 scripts/test_count.py`；lint 测试用：`python3 scripts/test_lint.py`。

@@ -26,15 +26,15 @@ LINT_PY = SCRIPTS / "lint.py"
 CLEAN_EPISODE = """第1集
 
 ### 1-1 客厅 夜 内
-人物：艾拉、莱恩
+人物：艾拉、托比
 
 △艾拉把合同推到桌沿。
 
 **艾拉**（冷笑）：你签字。
 
-莱恩：我不签。
+托比：我不签。
 
-△莱恩把单子往自己这边拉了一寸。
+△托比把单子往自己这边拉了一寸。
 """
 
 CLEAN_CHARACTERS = """# 人物小传
@@ -44,9 +44,9 @@ CLEAN_CHARACTERS = """# 人物小传
 - 海外稿译名：Ella
 - 身份：律师
 
-## 莱恩（对手）
+## 托比（对手）
 
-- 短名：Ryan
+- 短名：Toby
 """
 
 
@@ -95,9 +95,9 @@ class HelpersTest(unittest.TestCase):
     def test_roster_from_headings_and_short_names(self) -> None:
         names = parse_character_roster(CLEAN_CHARACTERS)
         self.assertIn("艾拉", names)
-        self.assertIn("莱恩", names)
+        self.assertIn("托比", names)
         self.assertIn("Ella", names)
-        self.assertIn("Ryan", names)
+        self.assertIn("Toby", names)
         self.assertNotIn("人物小传", names)
 
 
@@ -111,7 +111,7 @@ class LintRulesTest(unittest.TestCase):
             self.assertGreaterEqual(manner["冷笑"], 1)
 
     def test_speaker_not_in_scene_cast(self) -> None:
-        ep = CLEAN_EPISODE.replace("人物：艾拉、莱恩", "人物：莱恩")
+        ep = CLEAN_EPISODE.replace("人物：艾拉、托比", "人物：托比")
         with tempfile.TemporaryDirectory() as td:
             root = write_project(td, ep)
             issues, _, _ = lint_path(root)
@@ -119,8 +119,8 @@ class LintRulesTest(unittest.TestCase):
             self.assertTrue(any("艾拉" in m and "本场人物表" in m for m in msgs), msgs)
 
     def test_speaker_not_in_characters(self) -> None:
-        ep = CLEAN_EPISODE.replace("人物：艾拉、莱恩", "人物：艾拉、莱恩、琼斯")
-        ep = ep.replace("莱恩：我不签。", "琼斯：我不签。")
+        ep = CLEAN_EPISODE.replace("人物：艾拉、托比", "人物：艾拉、托比、琼斯")
+        ep = ep.replace("托比：我不签。", "琼斯：我不签。")
         with tempfile.TemporaryDirectory() as td:
             root = write_project(td, ep)
             issues, _, _ = lint_path(root)
@@ -160,8 +160,8 @@ class LintRulesTest(unittest.TestCase):
 
     def test_dialogue_mentioning_triangle_is_not_squeezed(self) -> None:
         ep = CLEAN_EPISODE.replace(
-            "莱恩：我不签。",
-            "莱恩：对白不要与 △ 挤在同一段。",
+            "托比：我不签。",
+            "托比：对白不要与 △ 挤在同一段。",
         )
         with tempfile.TemporaryDirectory() as td:
             root = write_project(td, ep)
@@ -172,14 +172,14 @@ class LintRulesTest(unittest.TestCase):
             )
 
     def test_pronoun_speaker(self) -> None:
-        ep = CLEAN_EPISODE.replace("莱恩：我不签。", "他：我不签。")
+        ep = CLEAN_EPISODE.replace("托比：我不签。", "他：我不签。")
         with tempfile.TemporaryDirectory() as td:
             root = write_project(td, ep)
             issues, _, _ = lint_path(root)
             self.assertTrue(any("说话人写成「他」" in i.message for i in issues), [i.message for i in issues])
 
     def test_missing_cast_line(self) -> None:
-        ep = CLEAN_EPISODE.replace("人物：艾拉、莱恩\n\n", "")
+        ep = CLEAN_EPISODE.replace("人物：艾拉、托比\n\n", "")
         with tempfile.TemporaryDirectory() as td:
             root = write_project(td, ep)
             issues, _, _ = lint_path(root)
@@ -208,7 +208,7 @@ class LintRulesTest(unittest.TestCase):
         self.assertEqual(main(["/tmp/does-not-exist-lint-skill"]), 1)
 
     def test_cliches_are_reported_but_not_errors(self) -> None:
-        ep = CLEAN_EPISODE + "\n莱恩：你也知道，这不可能。\n"
+        ep = CLEAN_EPISODE + "\n托比：你也知道，这不可能。\n"
         with tempfile.TemporaryDirectory() as td:
             root = write_project(td, ep)
             issues, manner, _ = lint_path(root)
